@@ -40,7 +40,7 @@ Always return the final answer strictly in natural Japanese. Keep code identifie
 ---
 ## 1. 変更概要の明確性
 - PR タイトルは「何を / なぜ」を 60 字以内で要約しているか。
-- 説明に作業内容の説明があるか。
+- 説明に作業内容が記載されているか。
 
 ## 2. 設計・アーキテクチャ
 - 単一責任: クラス/モジュールは 1 機能に集中しているか。
