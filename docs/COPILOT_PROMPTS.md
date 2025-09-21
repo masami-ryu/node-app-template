@@ -1,6 +1,6 @@
 # GitHub Copilot レビュー用プロンプト集
 
-> 具体的な操作手順は `./COPILOT_REVIEW_USAGE.md` を参照してください。
+> 具体的な操作手順は [./COPILOT_REVIEW_USAGE.md](./COPILOT_REVIEW_USAGE.md) を参照してください。
 
 Pull Request 上で Copilot Chat / Reviews に貼り付けて自動レビューを促進するためのプロンプト例集です。プロンプト入力は英語主体ですが、最終出力は常に **自然な日本語** に統一してください。
 
