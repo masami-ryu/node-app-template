@@ -5,6 +5,21 @@
 このガイドは Pull Request レビュー時に GitHub Copilot や人が一貫した指摘を行えるようにするための詳細観点集です。PR テンプレートから参照され、自動レビュー支援にも利用されます。
 
 ---
+### 言語ポリシー (Language Policy)
+レビューコメント (人間 / Copilot 生成を含む) は原則 **日本語** で記述してください。<br/>
+理由: チームでの認識齟齬防止・ナレッジ蓄積一貫性向上・オンボーディング効率化。
+
+Copilot / Chat へ英語プロンプトを投入する場合でも、最終出力を日本語に統一するため以下のラッパを併用できます:
+```
+Please produce the final output strictly in natural Japanese. Keep code identifiers unchanged. Do not include English explanatory sentences unless they are proper nouns.
+```
+コード断片にコメントを追加する際の推奨フォーマット例:
+```
+[must] この関数は責務が大きいため分割を検討してください (例: 検証処理と永続化処理を分離)。
+```
+英語出力が混入した場合は後述の自動チェック (GitHub Actions) が注意コメントを投稿する可能性があります。
+
+---
 ## 0. コメント記法 & 重大度ルール
 - 接頭辞 (既存ルール): `[must]`, `[imo]`, `[nits]`, `[ask]`, `[fyi]`
 - 追加推奨接頭辞: `[sec]` セキュリティ, `[perf]` パフォーマンス, `[test]` テスト, `[docs]` ドキュメント, `[ux]` 利便性

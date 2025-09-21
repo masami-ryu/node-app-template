@@ -1,0 +1,99 @@
+name: Enforce Japanese Copilot Comments
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+  pull_request_review:
+    types: [submitted, edited]
+  pull_request_review_comment:
+    types: [created, edited]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  scan-comments:
+    if: >-
+      (github.event.pull_request.draft == false) ||
+      (github.event_name == 'pull_request_review') ||
+      (github.event_name == 'pull_request_review_comment') ||
+      (github.event_name == 'issue_comment')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch PR & review comments via API
+        id: fetch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number || github.event.review.pull_request_url##*/ }}
+        run: |
+          set -euo pipefail
+          echo "Target PR number resolve phase"
+          # Fallback: when triggered by review or review_comment events, pull_request object exists; for issue_comment on PR it also works.
+          if [ -z "$PR_NUMBER" ]; then
+            echo "PR_NUMBER not auto-resolved; abort" >&2
+            exit 1
+          fi
+          echo "Fetching issue comments for PR #$PR_NUMBER"
+          curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/issues/$PR_NUMBER/comments?per_page=100" > issue_comments.json
+          echo "Fetching review comments (diff comments)"
+          curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/$PR_NUMBER/comments?per_page=100" > review_comments.json
+          echo "Fetching reviews (overall reviews)"
+          curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/$PR_NUMBER/reviews?per_page=100" > reviews.json
+          echo "Counts:" && jq 'length' issue_comments.json && jq 'length' review_comments.json && jq 'length' reviews.json
+          # Merge bodies into one file (some reviews have body, some not)
+          jq -r '.[].body // empty' issue_comments.json > all_bodies.txt
+          jq -r '.[].body // empty' review_comments.json >> all_bodies.txt
+          jq -r '.[].body // empty' reviews.json >> all_bodies.txt
+          echo "Combined bodies lines: $(wc -l < all_bodies.txt)"
+
+      - name: Detect English-heavy Copilot comments
+        id: detect
+        run: |
+          set -euo pipefail
+          # 判定基準: 英字率が高く (>=70%) かつ 日本語(ひらがな/カタカナ/漢字) が 5 文字未満
+          # Copilot 典型フレーズ (e.g., 'Here is', 'I think', 'You can') を含む場合にフラグ
+          cp all_bodies.txt bodies.txt || true
+          : > offenders.txt
+          while IFS= read -r line; do
+            total_chars=$(echo -n "$line" | tr -d '\n' | wc -c | tr -d ' ')
+            ja_chars=$(echo -n "$line" | grep -oE '[ぁ-んァ-ヶ一-龥]' | wc -l | tr -d ' ' || true)
+            en_chars=$(echo -n "$line" | grep -oE '[A-Za-z]' | wc -l | tr -d ' ' || true)
+            if [ "$total_chars" -gt 20 ]; then
+              if [ "$ja_chars" -lt 5 ] && [ "$en_chars" -gt 0 ]; then
+                if echo "$line" | grep -qiE 'here is|you can|i think|this (code|change)|we can'; then
+                  echo "----" >> offenders.txt
+                  echo "$line" >> offenders.txt
+                fi
+              fi
+            fi
+          done < bodies.txt
+          if [ -s offenders.txt ]; then
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Post warning comment
+        if: steps.detect.outputs.found == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
+        run: |
+          body=$(printf "English-only Copilot コメントが検出されました。\n\n以下のコメントは日本語化してください。\n\n<details><summary>検出内容</summary>\n\n%s\n\n</details>\n\nガイドライン参照: .github/REVIEW_GUIDE.md # 言語ポリシー" "$(sed 's/"/\\"/g' offenders.txt)")
+          jq -n --arg body "$body" '{body: $body}' > payload.json
+          curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
+            -d @payload.json \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/issues/$PR_NUMBER/comments" > /dev/null
+          echo "Posted enforcement comment"
