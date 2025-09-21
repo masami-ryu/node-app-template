@@ -1,4 +1,3 @@
-
 # Dev Container ガイド
 
 ## 主要ファイル
@@ -67,7 +66,7 @@ nodenv rehash
 
 - 任意の Node バージョンを `.node-version` で管理することを推奨します（`package.json` の `engines.node` は補助的用途）。
 - コンテナイメージは `mcr.microsoft.com/vscode/devcontainers/base:ubuntu` ベースです。別のベースを希望する場合は `Dockerfile` を編集してください。
- - anyenv definitions は対話プロンプトを避けるため `anyenv install --init` ではなく直接 `git clone --depth 1` で取得し、既存があれば `fetch + reset` で更新します。`~/.config/anyenv/anyenv-install` が壊れた場合は削除後コンテナ再起動、または手動 clone で復旧可能です。
+- anyenv definitions は対話プロンプトを避けるため `anyenv install --init` ではなく直接 `git clone --depth 1` で取得し、既存があれば `fetch + reset` で更新します。`~/.config/anyenv/anyenv-install` が壊れた場合は削除後コンテナ再起動、または手動 clone で復旧可能です。
 
 ---
 
