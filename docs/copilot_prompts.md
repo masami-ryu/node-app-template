@@ -23,7 +23,7 @@ Always return the final answer strictly in natural Japanese. Keep code identifie
 ```
 Always return the final answer strictly in natural Japanese. Keep code identifiers and proper nouns in original language. Do not add extra English commentary. Do not echo secrets, tokens, or credentials.
 You are a senior software engineer. Review this pull request diff.
-Refer to docs/code_review_guide.md and align wording with its categories.
+Refer to docs/review_guide.md and align wording with its categories.
 Tasks:
 1. List high severity issues with prefix [must].
 2. List potential security concerns with prefix [sec].
@@ -37,7 +37,7 @@ Limit to top 12 findings.
 ## 変更概要の要約生成
 ```
 Always return the final answer in natural Japanese.
-Refer to docs/code_review_guide.md and align wording with its categories.
+Refer to docs/review_guide.md and align wording with its categories.
 Summarize this pull request for a CHANGELOG entry.
 Include: problem, solution approach, notable risks, migration needs.
 Output in Japanese, 5 bullet points max.
@@ -46,7 +46,7 @@ Output in Japanese, 5 bullet points max.
 ## セキュリティ特化
 ```
 Always return the final answer in natural Japanese.
-Refer to docs/code_review_guide.md and align wording with its categories.
+Refer to docs/review_guide.md and align wording with its categories.
 Act as an application security reviewer.
 Scan the PR diff for:
 - missing input validation
@@ -60,7 +60,7 @@ Output each as a bullet starting with [sec]. If none, say 'No critical security 
 ## パフォーマンス特化
 ```
 Always return the final answer in natural Japanese.
-Refer to docs/code_review_guide.md and align wording with its categories.
+Refer to docs/review_guide.md and align wording with its categories.
 Identify potential performance issues in the PR diff.
 Focus on: N+1 queries, redundant loops, large object allocations, synchronous blocking I/O in hot paths.
 Prefix each finding with [perf]. Provide a concrete improvement suggestion.
@@ -69,7 +69,7 @@ Prefix each finding with [perf]. Provide a concrete improvement suggestion.
 ## テストギャップ特化
 ```
 Always return the final answer in natural Japanese.
-Refer to docs/code_review_guide.md and align wording with its categories.
+Refer to docs/review_guide.md and align wording with its categories.
 Check the PR diff and list missing or weak tests.
 Classify with [test] and specify the scenario name.
 Categories: boundary conditions, error handling, concurrency, large input, regression.
@@ -79,7 +79,7 @@ Return a markdown checklist.
 ## リファクタ提案
 ```
 Always return the final answer in natural Japanese.
-Refer to docs/code_review_guide.md and align wording with its categories.
+Refer to docs/review_guide.md and align wording with its categories.
 Suggest refactoring opportunities in the diff.
 Rules: do NOT reformat code style, focus on logic simplification, duplication removal, better naming, function extraction (>40 lines or >3 nested levels).
 Prefix each with [imo].
@@ -88,7 +88,7 @@ Prefix each with [imo].
 ## リスク & ロールバック評価
 ```
 Always return the final answer in natural Japanese.
-Refer to docs/code_review_guide.md and align wording with its categories.
+Refer to docs/review_guide.md and align wording with its categories.
 From the PR diff, identify deployment risks and rollback considerations.
 Return sections: RISKS, ROLLBACK_STRATEGY, MONITORING_METRICS.
 If database or schema changes detected, highlight irreversible steps with [must].
@@ -97,7 +97,7 @@ If database or schema changes detected, highlight irreversible steps with [must]
 ## ログ・監視改善
 ```
 Always return the final answer in natural Japanese.
-Refer to docs/code_review_guide.md and align wording with its categories.
+Refer to docs/review_guide.md and align wording with its categories.
 Review changes for observability gaps.
 Suggest missing logs (level + message focus), metrics, and traces.
 Prefix required production visibility gaps with [must], suggestions with [imo].
@@ -106,7 +106,7 @@ Prefix required production visibility gaps with [must], suggestions with [imo].
 ## 依存関係追加チェック
 ```
 Always return the final answer in natural Japanese.
-Refer to docs/code_review_guide.md and align wording with its categories.
+Refer to docs/review_guide.md and align wording with its categories.
 Look for new dependencies added or version upgrades.
 Assess for: unnecessary bloat, known security risk categories, duplication of existing functionality.
 Prefix concerns with [must] or [sec] as appropriate.
@@ -115,7 +115,7 @@ Prefix concerns with [must] or [sec] as appropriate.
 ## Diff ノイズ削減提案
 ```
 Always return the final answer in natural Japanese.
-Refer to docs/code_review_guide.md and align wording with its categories.
+Refer to docs/review_guide.md and align wording with its categories.
 Identify noisy or unrelated changes (format-only, commented-out code, unused variable removal) that could be split into a separate PR.
 List them with [nits].
 ```
@@ -123,7 +123,7 @@ List them with [nits].
 ## 既存ガイド整合性チェック
 ```
 Always return the final answer in natural Japanese.
-Refer to docs/code_review_guide.md and align wording with its categories.
+Refer to docs/review_guide.md and align wording with its categories.
 Compare the PR against our review guide categories (design, readability, error handling, security, performance, tests, docs, observability, dependencies, risk/rollback).
 Output a markdown table: Category | Status (OK / Review) | Note.
 Only mark 'Review' where specific actionable feedback exists.
@@ -132,7 +132,7 @@ Only mark 'Review' where specific actionable feedback exists.
 ## 大規模PR分割提案
 ```
 Always return the final answer in natural Japanese.
-Refer to docs/code_review_guide.md and align wording with its categories.
+Refer to docs/review_guide.md and align wording with its categories.
 Assume this PR feels large or multi-purpose.
 Propose a logical split plan (2-5 smaller PRs).
 For each part: Name, Scope, Dependencies, Risk Level.
@@ -141,7 +141,7 @@ For each part: Name, Scope, Dependencies, Risk Level.
 ## 英語→日本語要約
 ```
 Always return the final answer in natural Japanese.
-Refer to docs/code_review_guide.md and align wording with its categories.
+Refer to docs/review_guide.md and align wording with its categories.
 Summarize the key code review issues (prefixed) into Japanese concise bullet points.
 Group by prefix importance order: [must], [sec], [perf], [test], others.
 ```
