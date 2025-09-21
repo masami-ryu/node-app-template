@@ -74,20 +74,19 @@ jobs:
           # Copilot 典型フレーズ (e.g., 'Here is', 'I think', 'You can') を含む場合にフラグ
           cp all_bodies.txt bodies.txt || true
           : > offenders.txt
-          while IFS= read -r line; do
-            current_line="$line"
-            total_chars=$(printf "%s" "$current_line" | tr -d '\n' | wc -c | tr -d ' ')
-            ja_chars=$(grep -oE '[ぁ-んァ-ヶ一-龥]' <<< "$current_line" | wc -l | tr -d ' ' || true)
-            en_chars=$(grep -oE '[A-Za-z]' <<< "$current_line" | wc -l | tr -d ' ' || true)
-            if [ "$total_chars" -gt 20 ]; then
-              if [ "$ja_chars" -lt 5 ] && [ "$en_chars" -gt 0 ]; then
-                if grep -qiE 'here is|you can|i think|this (code|change)|we can|consider|should|would|could|might|please|recommended' <<< "$current_line"; then
-                  echo "----" >> offenders.txt
-                  echo "$current_line" >> offenders.txt
-                fi
-              fi
-            fi
-          done < bodies.txt
+          awk '
+            {
+              total_chars = length($0);
+              ja_chars = gsub(/[ぁ-んァ-ヶ一-龥]/, "", $0);
+              en_chars = gsub(/[A-Za-z]/, "", $0);
+              if (total_chars > 20 && ja_chars < 5 && en_chars > 0) {
+                if (tolower($0) ~ /(here is|you can|i think|this (code|change)|we can|consider|should|would|could|might|please|recommended)/) {
+                  print "----" >> "offenders.txt";
+                  print $0 >> "offenders.txt";
+                }
+              }
+            }
+          ' bodies.txt
           if [ -s offenders.txt ]; then
             echo "found=true" >> $GITHUB_OUTPUT
           else
