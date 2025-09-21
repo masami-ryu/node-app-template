@@ -69,7 +69,7 @@ Return only [must], [sec], [perf] findings. Max 8 lines.
 
 ---
 ## 7. VS Code での使用手順
-1. 最新 `main` を取り込み: `git fetch origin && git rebase origin/main`
+1. 最新 `develop` を取り込み: `git fetch origin && git rebase origin/main`
 2. ブランチを checkout 済で変更が残っている状態
 3. Copilot Chat を開き `@git diff` などで差分を明示 (拡張機能がサポートしていれば)
 4. プロンプト貼付 → 出力検証 → 必要なら即リファクタ
