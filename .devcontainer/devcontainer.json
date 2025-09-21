@@ -1,0 +1,17 @@
+{
+  "name": "Dev Container (anyenv + nodenv)",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": "."
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
+    }
+  },
+  "postCreateCommand": "/usr/local/bin/devcontainer-post-create.sh",
+  "remoteUser": "vscode"
+}
