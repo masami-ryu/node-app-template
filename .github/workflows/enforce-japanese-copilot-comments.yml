@@ -80,7 +80,7 @@ jobs:
             en_chars=$(echo -n "$line" | grep -oE '[A-Za-z]' | wc -l | tr -d ' ' || true)
             if [ "$total_chars" -gt 20 ]; then
               if [ "$ja_chars" -lt 5 ] && [ "$en_chars" -gt 0 ]; then
-                if echo "$line" | grep -qiE 'here is|you can|i think|this (code|change)|we can'; then
+                if echo "$line" | grep -qiE 'here is|you can|i think|this (code|change)|we can|consider|should|would|could|might|please|recommended'; then
                   echo "----" >> offenders.txt
                   echo "$line" >> offenders.txt
                 fi
