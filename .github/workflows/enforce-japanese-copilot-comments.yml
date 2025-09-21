@@ -99,8 +99,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
         run: |
-          body=$(printf "English-only Copilot コメントが検出されました。\n\n以下のコメントは日本語化してください。\n\n<details><summary>検出内容</summary>\n\n%s\n\n</details>\n\nガイドライン参照: .github/REVIEW_GUIDE.md # 言語ポリシー" "$(sed 's/"/\\"/g' offenders.txt)")
-          jq -n --arg body "$body" '{body: $body}' > payload.json
+          jq -Rs --arg pre "English-only Copilot コメントが検出されました。\n\n以下のコメントは日本語化してください。\n\n<details><summary>検出内容</summary>\n\n" \
+            --arg post "\n\n</details>\n\nガイドライン参照: .github/REVIEW_GUIDE.md # 言語ポリシー" \
+            '{body: ($pre + . + $post)}' offenders.txt > payload.json
           curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
             -d @payload.json \
             "https://api.github.com/repos/${GITHUB_REPOSITORY}/issues/$PR_NUMBER/comments" > /dev/null
