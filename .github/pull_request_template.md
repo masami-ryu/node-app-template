@@ -22,8 +22,6 @@
 -->
 <!-- for GitHub Copilot review rule -->
 
-
----
 ## 📝 作業内容
 
 - 
