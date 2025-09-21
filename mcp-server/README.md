@@ -4,8 +4,9 @@
 
 ## 特徴
 - JSON-RPC 2.0 over stdio
-- 実装メソッド: `initialize`, `ping`, `shutdown`, `exit`
-- 未サポート: バッチリクエスト、拡張 tool 呼び出し、context streaming
+- 実装メソッド: `initialize`, `ping`, `listTools`, `callTool`, `shutdown`, `exit`
+- 最小の簡易 tools API (echo / time / uppercase)
+- 未サポート: バッチリクエスト、context streaming、認証
 
 ## 使い方
 ```bash
@@ -23,6 +24,10 @@ echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"clientName":"manu
 printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"initialize"}' | node dist/server.js
 # ping (初期化前はエラー)
 printf '%s\n' '{"jsonrpc":"2.0","id":2,"method":"ping"}' | node dist/server.js
+# listTools
+printf '%s\n' '{"jsonrpc":"2.0","id":3,"method":"listTools"}' | node dist/server.js
+# callTool echo
+printf '%s\n' '{"jsonrpc":"2.0","id":4,"method":"callTool","params":{"name":"echo","arguments":{"text":"hello"}}}' | node dist/server.js
 ```
 
 ## 開発 (ホット実行)
@@ -31,11 +36,37 @@ printf '%s\n' '{"jsonrpc":"2.0","id":2,"method":"ping"}' | node dist/server.js
 npm run dev
 ```
 
+## tools API 仕様 (暫定)
+### listTools
+Request:
+```json
+{"jsonrpc":"2.0","id":1,"method":"listTools"}
+```
+Response (例):
+```json
+{"jsonrpc":"2.0","id":1,"result":{"tools":[{"name":"echo","description":"与えられた text をそのまま返す"}]}}
+```
+
+### callTool
+Request (echo):
+```json
+{"jsonrpc":"2.0","id":2,"method":"callTool","params":{"name":"echo","arguments":{"text":"hi"}}}
+```
+Response:
+```json
+{"jsonrpc":"2.0","id":2,"result":{"name":"echo","output":{"text":"hi"}}}
+```
+
+エラーコード:
+- `-32010` 未初期化呼び出し
+- `-32011` 不明ツール
+- `-32012` 引数バリデーション失敗
+
 ## 将来拡張アイデア
-- tools: `listTools` / `callTool` API 追加
 - context: 周辺ソースコードスニペット提供
 - エラーロギング & 構造化 JSON ログ
 - Batch リクエスト対応
+- tools 内でのストリーミング応答
 
 ## 注意
 このサーバーは概念実証目的であり、安定性や完全な MCP 仕様準拠は保証しません。

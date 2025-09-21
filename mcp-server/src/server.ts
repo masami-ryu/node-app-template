@@ -6,13 +6,77 @@ import {
   JsonRpcError,
   JsonRpcSuccess,
   InitializeParams,
-  InitializeResult
+  InitializeResult,
+  ToolDescriptor,
+  ListToolsResult,
+  CallToolParams,
+  CallToolResult,
+  ERROR_CODES
 } from './types.js';
 
 const rl = createInterface({ input });
 
 let initialized = false;
 let shuttingDown = false;
+
+// ---- Tool registry (シンプルなインメモリ) ----
+const tools: ToolDescriptor[] = [
+  {
+    name: 'echo',
+    description: '与えられた text をそのまま返す',
+    inputSchema: {
+      type: 'object',
+      properties: { text: { type: 'string', description: '任意の文字列' } },
+      required: ['text'],
+      additionalProperties: false
+    }
+  },
+  {
+    name: 'time',
+    description: '現在の Unix 時刻(ms)と ISO8601を返す',
+    inputSchema: { type: 'object', properties: {}, additionalProperties: false }
+  },
+  {
+    name: 'uppercase',
+    description: 'text を大文字化して返す',
+    inputSchema: {
+      type: 'object',
+      properties: { text: { type: 'string', description: '変換対象文字列' } },
+      required: ['text'],
+      additionalProperties: false
+    }
+  }
+];
+
+function runTool(params: CallToolParams): CallToolResult {
+  const tool = tools.find(t => t.name === params.name);
+  if (!tool) {
+    return { name: params.name, error: 'Unknown tool' };
+  }
+  const args = params.arguments || {};
+  // 簡易必須チェック
+  if (tool.inputSchema?.required) {
+    for (const r of tool.inputSchema.required) {
+      if (!(r in args)) {
+        return { name: tool.name, error: `Missing required argument: ${r}` };
+      }
+    }
+  }
+  try {
+    switch (tool.name) {
+      case 'echo':
+        return { name: 'echo', output: { text: String(args['text']) } };
+      case 'time':
+        return { name: 'time', output: { epochMs: Date.now(), iso: new Date().toISOString() } };
+      case 'uppercase':
+        return { name: 'uppercase', output: { text: String(args['text']).toUpperCase() } };
+      default:
+        return { name: tool.name, error: 'Not implemented' };
+    }
+  } catch (e) {
+    return { name: tool.name, error: (e as Error).message };
+  }
+}
 
 function send(response: JsonRpcResponse) {
   output.write(JSON.stringify(response) + '\n');
@@ -38,7 +102,7 @@ function handleRequest(req: JsonRpcRequest) {
       const params = (req.params || {}) as InitializeParams;
       const result: InitializeResult = {
         serverName: 'node-app-template-mcp-server',
-        capabilities: { ping: true }
+        capabilities: { ping: true, tools: true }
       };
       initialized = true;
       return success(req.id, result);
@@ -46,6 +110,20 @@ function handleRequest(req: JsonRpcRequest) {
     case 'ping': {
       if (!initialized) return error(req.id, -32002, 'Server not initialized');
       return success(req.id, { pong: true, timestamp: Date.now() });
+    }
+    case 'listTools': {
+      if (!initialized) return error(req.id, ERROR_CODES.NOT_INITIALIZED, 'Server not initialized');
+      const result: ListToolsResult = { tools };
+      return success(req.id, result);
+    }
+    case 'callTool': {
+      if (!initialized) return error(req.id, ERROR_CODES.NOT_INITIALIZED, 'Server not initialized');
+      const params = (req.params || {}) as CallToolParams;
+      if (!params.name) return error(req.id, ERROR_CODES.INVALID_TOOL_ARGS, 'Missing tool name');
+      const tool = tools.find(t => t.name === params.name);
+      if (!tool) return error(req.id, ERROR_CODES.UNKNOWN_TOOL, `Unknown tool: ${params.name}`);
+      const result = runTool(params);
+      return success(req.id, result);
     }
     case 'shutdown': {
       shuttingDown = true;
