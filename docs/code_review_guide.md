@@ -2,7 +2,8 @@
 
 > 補助: 具体的な Copilot への指示テンプレートは [copilot_prompts.md](./copilot_prompts.md) を参照してください。
 
-このガイドは Pull Request レビュー時に GitHub Copilot や人が一貫した指摘を行えるようにするための詳細観点集です。PR テンプレートから参照され、自動レビュー支援にも利用されます。
+このガイドは Pull Request レビュー時に GitHub Copilot や人が一貫した指摘を行えるようにするための詳細観点集です。<br />
+PR テンプレートから参照され、自動レビュー支援にも利用されます。
 
 ---
 ### 言語ポリシー (Language Policy)
@@ -17,7 +18,6 @@ Always return the final answer strictly in natural Japanese. Keep code identifie
 ```
 [must] この関数は責務が大きいため分割を検討してください (例: 検証処理と永続化処理を分離)。
 ```
-英語出力が混入した場合は後述の自動チェック (GitHub Actions) が注意コメントを投稿する可能性があります。
 
 ---
 ## 0. コメント記法 & 重大度ルール
@@ -137,7 +137,7 @@ Always return the final answer strictly in natural Japanese. Keep code identifie
 ## 18. 適用の進め方
 1. PR 作成者はセルフレビューで本ガイドを走査し未対応を先に修正。
 2. Draft → Open へ移行時に最小差分化 (不要変更除去)。
-3. レビュワーは高→低重大度順にレビュー。
+3. レビュアーは重大度順（高→低）にレビュー。
 4. 全 `[must]/[sec]` 解消 + 合意形成後マージ。
 
 
