@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ms-vscode-remote.remote-containers",
+    "github.vscode-pull-request-github",
+    "eamodio.gitlens"
+  ],
+  "unwantedRecommendations": []
+}
