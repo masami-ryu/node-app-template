@@ -120,9 +120,6 @@ Limit to top 12 findings.
 3. セキュリティ / テスト / 分割提案など追加プロンプトで深掘り
 4. Ready 化 → 人間レビュー → `[must]` / `[sec]` 解消後マージ
 
-### 自動化
-- 英語コメント検出: `.github/workflows/enforce-japanese-copilot-comments.yml` が英語主体の Copilot コメントを検出し注意
-
 ### ベストプラクティス抜粋
 - 出力は“下書き” と捉え鵜呑みにしない
 - 冗長時: `Limit to top 8 findings.` を末尾追加
