@@ -106,3 +106,33 @@ Markdown ドキュメントは以下を原則とします:
 | Prettier | `esbenp.prettier-vscode` | コード整形 |
 
 `devcontainer.json` と `.vscode/extensions.json` にも反映済みです。
+
+---
+
+## Experimental: MCP Server
+最小構成の JSON-RPC ベース MCP 互換サーバー例を `mcp-server/` に含めています。
+
+### 提供機能 (現状)
+- メソッド: `initialize`, `ping`, `shutdown`, `exit`
+- stdio 経由の JSON-RPC 2.0 単発リクエスト (Batch 未対応)
+
+### 目的
+- 将来的なツール連携 / コンテキスト供給の実験基盤
+- プロンプト駆動レビュー支援との統合検討土台
+
+### 使い方 (例)
+```bash
+cd mcp-server
+npm install
+npm run build
+printf '%s\n' '{"jsonrpc":"2.0","id":1,"method":"initialize"}' | node dist/server.js
+printf '%s\n' '{"jsonrpc":"2.0","id":2,"method":"ping"}' | node dist/server.js
+```
+
+### 今後の拡張候補
+- tools API (`listTools` / `callTool`) 追加
+- context 抽出 (リポジトリ内コードスニペット提供)
+- Batch / 並列リクエスト対応
+- 構造化ログ (JSON) とレベル制御
+
+詳細: `mcp-server/README.md`
