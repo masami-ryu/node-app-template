@@ -1,6 +1,6 @@
 # Node.js アプリ開発環境テンプレート
 
-VS Code の Dev Container を使い、統一された開発環境を構築します。<br />
+VS Code の Dev Container を使い、統一された開発環境を構築します。  
 anyenv と nodenv で Node.js のバージョン管理を行えるように設定しています。
 
 > ✅ 詳細手順 (Node バージョン指定 / nodenv 復旧 / フォールバックバージョン変更 など) は必ず [docs/dev_container_guide.md](docs/dev_container_guide.md) を参照してください。ここでは概要のみ記載します。
