@@ -40,8 +40,7 @@ Please produce the final output strictly in natural Japanese. Keep code identifi
 ---
 ## 1. 変更概要の明確性
 - PR タイトルは「何を / なぜ」を 60 字以内で要約しているか。
-- 説明に: 背景 / 目的 / スコープ / 非スコープ / リスク があるか。
-- Issue/チケット番号リンクがあるか。
+- 説明に作業内容の説明があるか。
 
 ## 2. 設計・アーキテクチャ
 - 単一責任: クラス/モジュールは 1 機能に集中しているか。
@@ -141,16 +140,6 @@ Please produce the final output strictly in natural Japanese. Keep code identifi
 3. レビュワーは高→低重大度順にレビュー。
 4. 全 `[must]/[sec]` 解消 + 合意形成後マージ。
 
----
-## 付録: チェックリスト (著者用)
-- [ ] 目的/背景/スコープ/非スコープ記述
-- [ ] Issueリンク
-- [ ] セルフレビュー実施・不要差分除去
-- [ ] Lint/Format/CI 通過
-- [ ] テスト追加/更新 & カバレッジ影響確認
-- [ ] ドキュメント/README/CHANGELOG 更新
-- [ ] 秘密情報含まない
-- [ ] ロールバック/リリース戦略明記
 
 ---
 このファイルは継続的に改善します。改善案は PR で `[docs]` タグを付けて提案してください。
