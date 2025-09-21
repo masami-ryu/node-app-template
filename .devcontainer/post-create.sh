@@ -4,7 +4,7 @@ set -euo pipefail
 # Internal fallback Node.js version used only if the project does not define
 # a version via `.node-version` or `package.json engines.node`.
 # Change this value to update the default (or set to empty to disable fallback).
-DEFAULT_NODE_VERSION="20.11.1"
+DEFAULT_NODE_VERSION="22.19.0"
 
 HOME_DIR="/home/vscode"
 ANYENV_DIR="$HOME_DIR/.anyenv"
