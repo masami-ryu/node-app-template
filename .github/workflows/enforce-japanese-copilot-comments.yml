@@ -75,14 +75,15 @@ jobs:
           cp all_bodies.txt bodies.txt || true
           : > offenders.txt
           while IFS= read -r line; do
-            total_chars=$(echo -n "$line" | tr -d '\n' | wc -c | tr -d ' ')
-            ja_chars=$(echo -n "$line" | grep -oE '[ぁ-んァ-ヶ一-龥]' | wc -l | tr -d ' ' || true)
-            en_chars=$(echo -n "$line" | grep -oE '[A-Za-z]' | wc -l | tr -d ' ' || true)
+            current_line="$line"
+            total_chars=$(printf "%s" "$current_line" | tr -d '\n' | wc -c | tr -d ' ')
+            ja_chars=$(grep -oE '[ぁ-んァ-ヶ一-龥]' <<< "$current_line" | wc -l | tr -d ' ' || true)
+            en_chars=$(grep -oE '[A-Za-z]' <<< "$current_line" | wc -l | tr -d ' ' || true)
             if [ "$total_chars" -gt 20 ]; then
               if [ "$ja_chars" -lt 5 ] && [ "$en_chars" -gt 0 ]; then
-                if echo "$line" | grep -qiE 'here is|you can|i think|this (code|change)|we can|consider|should|would|could|might|please|recommended'; then
+                if grep -qiE 'here is|you can|i think|this (code|change)|we can|consider|should|would|could|might|please|recommended' <<< "$current_line"; then
                   echo "----" >> offenders.txt
-                  echo "$line" >> offenders.txt
+                  echo "$current_line" >> offenders.txt
                 fi
               fi
             fi
