@@ -1,6 +1,6 @@
 # コードレビュー観点ガイド (for GitHub Copilot & Human Reviewers)
 
-> 補助: 具体的な Copilot への指示テンプレートは [COPILOT_PROMPTS.md](./COPILOT_PROMPTS.md) を参照してください。
+> 補助: 具体的な Copilot への指示テンプレートは [COPILOT_PROMPTS.md](../docs/COPILOT_PROMPTS.md) を参照してください。
 
 このガイドは Pull Request レビュー時に GitHub Copilot や人が一貫した指摘を行えるようにするための詳細観点集です。PR テンプレートから参照され、自動レビュー支援にも利用されます。
 

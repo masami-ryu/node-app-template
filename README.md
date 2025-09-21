@@ -79,3 +79,54 @@ nodenv rehash
 ---
 
 何か追加したい設定（例: yarn, pnpm, yarn2, global npm packages）があれば教えてください。
+
+---
+
+## レビュー運用 (GitHub Copilot 活用方針)
+
+このリポジトリでは Pull Request レビュー効率化と品質確保のため Copilot を以下の方針で利用します。
+
+### 目的
+- 初期レビュー (粗スクリーニング) を高速化
+- セキュリティ / パフォーマンス / テスト抜けの取りこぼし低減
+- コメント言語の日本語統一によるナレッジ蓄積性向上
+
+### 中核ドキュメント
+| 項目 | 位置 | 用途 |
+|------|------|------|
+| レビュー観点ガイド | `.github/REVIEW_GUIDE.md` | 観点網羅 & 重大度基準 |
+| プロンプト集 | `docs/COPILOT_PROMPTS.md` | Copilot へ貼るプロンプトテンプレ |
+| 利用手順 | `docs/COPILOT_REVIEW_USAGE.md` | 具体操作 (どこで/いつ/どう貼るか) |
+
+### コメント接頭辞 (Prefix)
+`[must]` (必須) / `[sec]` (セキュリティ) / `[perf]` (性能) / `[test]` (テスト) / `[docs]` (ドキュメント) / `[imo]` (任意改善) / `[nits]` (微細) / `[ask]` (質問) / `[fyi]` (参考)
+
+### 推奨プロンプト最小形
+```
+Always return the final answer strictly in natural Japanese.
+You are a senior software engineer. Review this pull request diff.
+Tasks:
+1. List high severity issues with prefix [must].
+2. List potential security concerns with prefix [sec].
+3. List performance risks with prefix [perf].
+4. Suggest test gaps with prefix [test].
+Return sections: MUST, SECURITY, PERFORMANCE, TESTS, OTHERS.
+Limit to top 12 findings.
+```
+
+### 運用フロー (概要)
+1. Draft PR 作成 & テンプレセルフチェック
+2. 上記プロンプトで初回自動レビュー → 有用な指摘を取捨選択
+3. セキュリティ / テスト / 分割提案など追加プロンプトで深掘り
+4. Ready 化 → 人間レビュー → `[must]` / `[sec]` 解消後マージ
+
+### 自動化
+- 英語コメント検出: `.github/workflows/enforce-japanese-copilot-comments.yml` が英語主体の Copilot コメントを検出し注意
+
+### ベストプラクティス抜粋
+- 出力は“下書き” と捉え鵜呑みにしない
+- 冗長時: `Limit to top 8 findings.` を末尾追加
+- スタイルノイズ抑制: `Avoid stylistic nitpicks.`
+- スコープ絞り: `Focus only on files under src/...` / `Ignore *.md`
+
+詳細は上記ドキュメントを参照。改善提案歓迎です。
