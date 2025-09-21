@@ -30,11 +30,19 @@ jobs:
         id: fetch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number || github.event.review.pull_request_url##*/ }}
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
+          PULL_REQUEST_URL: ${{ github.event.review.pull_request_url }}
         run: |
           set -euo pipefail
           echo "Target PR number resolve phase"
           # Fallback: when triggered by review or review_comment events, pull_request object exists; for issue_comment on PR it also works.
+          if [ -z "$PR_NUMBER" ]; then
+            # Try to extract PR number from PULL_REQUEST_URL if available
+            if [ -n "${PULL_REQUEST_URL:-}" ]; then
+              PR_NUMBER="$(basename "$PULL_REQUEST_URL")"
+              echo "Extracted PR_NUMBER from PULL_REQUEST_URL: $PR_NUMBER"
+            fi
+          fi
           if [ -z "$PR_NUMBER" ]; then
             echo "PR_NUMBER not auto-resolved; abort" >&2
             exit 1
