@@ -11,7 +11,7 @@
 
 Copilot / Chat へ英語プロンプトを投入する場合でも、最終出力を日本語に統一するため以下のラッパを併用できます:
 ```
-Please produce the final output strictly in natural Japanese. Keep code identifiers unchanged. Do not include English explanatory sentences unless they are proper nouns.
+Always return the final answer strictly in natural Japanese. Keep code identifiers and proper nouns in original language.
 ```
 コード断片にコメントを追加する際の推奨フォーマット例:
 ```
