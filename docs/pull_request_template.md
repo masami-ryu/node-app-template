@@ -1,4 +1,5 @@
 <!-- for GitHub Copilot review rule -->
+<!--
 ## Copilot 自動レビュー期待事項
 
 ### コメントルール
@@ -20,7 +21,7 @@
 -  [test] テスト関連
 -  [docs] ドキュメント関連
 -  [ux] 利便性/アクセシビリティ
-
+-->
 <!-- for GitHub Copilot review rule -->
 
 
