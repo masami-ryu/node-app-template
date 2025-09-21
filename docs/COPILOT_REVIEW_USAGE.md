@@ -87,8 +87,8 @@ Explain if this change introduces a performance regression. If safe, reply "[per
 ## 9. 指摘をコメント化する際の変換指針
 | Copilot出力例 | コメント化時 | 備考 |
 |---------------|--------------|------|
-| 関数が長い → 分割推奨 | `[imo] 関数Xは80行超。検証/永続化を分離可能` | WHY を短く明示 |
-| バリデーション欠如 | `[must] 入力Y未検証。isValidY() 追加し400返却で早期終了を推奨` | 修正案必須 |
+| 関数が長い → 分割推奨 | `[imo] getUserData関数は80行超。検証/永続化を分離可能` | WHY を短く明示 |
+| バリデーション欠如 | `[must] userInput未検証。isValidUserInput() 追加し400返却で早期終了を推奨` | 修正案必須 |
 | パフォーマンス懸念あいまい | (採用しない) | 根拠薄い指摘は捨てる |
 
 ---
