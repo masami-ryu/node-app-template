@@ -70,6 +70,7 @@ export interface CallToolResult {
 export const ERROR_CODES = {
   NOT_INITIALIZED: -32010,
   UNKNOWN_TOOL: -32011,
-  INVALID_TOOL_ARGS: -32012
+  INVALID_TOOL_ARGS: -32012,
+  TOOL_EXEC_ERROR: -32013
 } as const;
 

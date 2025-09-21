@@ -1,5 +1,6 @@
 import { createInterface } from 'node:readline';
 import { stdin as input, stdout as output } from 'node:process';
+import { Ajv, type AnySchema } from 'ajv';
 import {
   JsonRpcRequest,
   JsonRpcResponse,
@@ -48,33 +49,59 @@ const tools: ToolDescriptor[] = [
   }
 ];
 
-function runTool(params: CallToolParams): CallToolResult {
+// Ajv インスタンス (追加プロパティ禁止, allErrors で複数取得)
+const ajv = new Ajv({ allErrors: true, allowUnionTypes: true });
+type ValidatorFn = (data: unknown) => boolean;
+const compiledSchemas: Record<string, ValidatorFn> = {};
+
+function getValidator(tool: ToolDescriptor) {
+  if (!tool.inputSchema) return null;
+  if (!compiledSchemas[tool.name]) {
+  compiledSchemas[tool.name] = ajv.compile(tool.inputSchema as AnySchema) as ValidatorFn;
+  }
+  return compiledSchemas[tool.name];
+}
+
+function runTool(params: CallToolParams): { ok: true; result: CallToolResult } | { ok: false; code: number; message: string; data?: unknown } {
   const tool = tools.find(t => t.name === params.name);
   if (!tool) {
-    return { name: params.name, error: 'Unknown tool' };
+    return { ok: false, code: ERROR_CODES.UNKNOWN_TOOL, message: `Unknown tool: ${params.name}` };
   }
-  const args = params.arguments || {};
-  // 簡易必須チェック
-  if (tool.inputSchema?.required) {
-    for (const r of tool.inputSchema.required) {
-      if (!(r in args)) {
-        return { name: tool.name, error: `Missing required argument: ${r}` };
-      }
+  const args = (params.arguments || {}) as Record<string, unknown>;
+  const validator = getValidator(tool);
+  if (validator) {
+    const valid = validator(args);
+    if (!valid) {
+      return {
+        ok: false,
+        code: ERROR_CODES.INVALID_TOOL_ARGS,
+        message: 'Invalid arguments',
+        data: (validator as any).errors
+      };
+    }
+  }
+  // 文字列長安全ガード (text 最大 4KB)
+  if ('text' in args && typeof args['text'] === 'string') {
+    const text = args['text'] as string;
+    if (text.length > 4096) {
+      return { ok: false, code: ERROR_CODES.INVALID_TOOL_ARGS, message: 'text too long (>4096)' };
     }
   }
   try {
     switch (tool.name) {
       case 'echo':
-        return { name: 'echo', output: { text: String(args['text']) } };
+        if (typeof args['text'] !== 'string') return { ok: false, code: ERROR_CODES.INVALID_TOOL_ARGS, message: 'text must be string' };
+        return { ok: true, result: { name: 'echo', output: { text: args['text'] } } };
       case 'time':
-        return { name: 'time', output: { epochMs: Date.now(), iso: new Date().toISOString() } };
+        return { ok: true, result: { name: 'time', output: { epochMs: Date.now(), iso: new Date().toISOString() } } };
       case 'uppercase':
-        return { name: 'uppercase', output: { text: String(args['text']).toUpperCase() } };
+        if (typeof args['text'] !== 'string') return { ok: false, code: ERROR_CODES.INVALID_TOOL_ARGS, message: 'text must be string' };
+        return { ok: true, result: { name: 'uppercase', output: { text: (args['text'] as string).toUpperCase() } } };
       default:
-        return { name: tool.name, error: 'Not implemented' };
+        return { ok: false, code: ERROR_CODES.TOOL_EXEC_ERROR, message: 'Tool not implemented' };
     }
   } catch (e) {
-    return { name: tool.name, error: (e as Error).message };
+    return { ok: false, code: ERROR_CODES.TOOL_EXEC_ERROR, message: (e as Error).message };
   }
 }
 
@@ -120,18 +147,20 @@ function handleRequest(req: JsonRpcRequest) {
       if (!initialized) return error(req.id, ERROR_CODES.NOT_INITIALIZED, 'Server not initialized');
       const params = (req.params || {}) as CallToolParams;
       if (!params.name) return error(req.id, ERROR_CODES.INVALID_TOOL_ARGS, 'Missing tool name');
-      const tool = tools.find(t => t.name === params.name);
-      if (!tool) return error(req.id, ERROR_CODES.UNKNOWN_TOOL, `Unknown tool: ${params.name}`);
-      const result = runTool(params);
-      return success(req.id, result);
+      const exec = runTool(params);
+      if (!exec.ok) return error(req.id, exec.code, exec.message, exec.data);
+      return success(req.id, exec.result);
     }
     case 'shutdown': {
       shuttingDown = true;
       return success(req.id, {});
     }
     case 'exit': {
-      process.exit(shuttingDown ? 0 : 1);
-      return; // unreachable
+      // graceful: readline close -> 'close' 後に exit
+      const code = shuttingDown ? 0 : 1;
+      rl.close();
+      setImmediate(() => process.exit(code));
+      return;
     }
     default:
       return error(req.id, -32601, `Method not found: ${req.method}`);
@@ -147,8 +176,9 @@ rl.on('line', (line) => {
     return error(null, -32700, 'Parse error');
   }
   if (Array.isArray(parsed)) {
-    // Batch not implemented for simplicity
-    return error(null, -32600, 'Batch requests not supported');
+    // Batch not implemented: JSON-RPC 2.0 では配列 -> Batch. 現行サーバー方針として非対応を明示
+    // エラーコードは -32600 (Invalid Request) を採用しメッセージに非対応である旨を記述
+    return error(null, -32600, 'Batch requests not supported (single request only)');
   } else {
     handleRequest(parsed);
   }
