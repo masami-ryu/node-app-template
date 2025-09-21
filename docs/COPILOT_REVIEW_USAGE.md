@@ -99,7 +99,7 @@ Explain if this change introduces a performance regression. If safe, reply "[per
 | 英語混入 | 補助説明が英語 | 日本語ラッパを最上段・末尾に重ねる |
 | 過剰指摘 | 30件以上羅列 | `Limit to top 10 findings.` |
 | 関連性低 | vendor/lock 解析 | `Ignore vendor/, *.lock` |
-| 既修正が再提示 | ループ | 再実行前に差分を再確認してから再投げ |
+| 既修正が再提示 | ループ | 再実行前に差分を再確認してから再実行 |
 
 ---
 ## 11. チートシート (抜粋)
