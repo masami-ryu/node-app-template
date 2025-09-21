@@ -80,7 +80,7 @@ Return only [must], [sec], [perf] findings. Max 8 lines.
 GitHub 差分行のアクション (Copilot アイコン) から短いプロンプト:
 ```
 Always return the final answer strictly in natural Japanese.
-Explain if this change introduces a performance regression. If safe, reply '[perf] 問題なし'.
+Explain if this change introduces a performance regression. If safe, reply "[perf] 問題なし".
 ```
 
 ---
