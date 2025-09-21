@@ -82,3 +82,18 @@ Markdown ドキュメントは以下を原則とします:
 - 参照リンクは相対パスで小文字名に統一
 
 理由: 一覧表示時の視認性/可読性向上、一貫したレビュー基準確立。
+
+---
+
+## 推奨 VS Code 拡張 (任意)
+Dev Container 起動時に自動インストール / 推奨表示されます。必須ではありませんが、開発体験向上のため導入を推奨します。
+
+| 拡張 | ID | 用途概要 |
+|------|----|----------|
+| Dev Containers | `ms-vscode-remote.remote-containers` | コンテナ開発環境統合操作 |
+| GitHub Pull Requests | `github.vscode-pull-request-github` | PR レビュー / コメント連携 |
+| GitLens | `eamodio.gitlens` | Git 履歴・責務トレース可視化 |
+| ESLint | `dbaeumer.vscode-eslint` | Lint / 品質チェック |
+| Prettier | `esbenp.prettier-vscode` | コード整形 |
+
+`devcontainer.json` と `.vscode/extensions.json` にも反映済みです。
